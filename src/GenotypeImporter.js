@@ -14,6 +14,8 @@ export default class GenotypeImporter {
     this.genomeMap = genomeMap;
     this.markerIndices = new Map();
     this.germplasmList = [];
+	this.processedLines;
+	this.totalLineCount;
   }
 
   getState(genoString) {
@@ -82,12 +84,20 @@ export default class GenotypeImporter {
   }
 
   parseFile(fileContents) {
+	this.processedLines = 0;
+	this.totalLineCount = 0;
     const lines = fileContents.split(/\r?\n/);
-    for (let line = 0; line < lines.length; line += 1) {
+	this.totalLineCount = lines.length;
+    for (let line = 0; line < this.totalLineCount; line += 1) {
       this.processFileLine(lines[line]);
+	  this.processedLines = line;
     }
 
     return this.germplasmList;
+  }
+
+  getImportProgressPercentage() {
+	return parseInt(this.processedLines + " / " + this.totalLineCount);
   }
 
   // In situations where a map hasn't been provided, we want to create a fake or

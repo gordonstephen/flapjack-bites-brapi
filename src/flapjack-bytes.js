@@ -8,6 +8,7 @@ import DataSet from './DataSet';
 
 export default function GenotypeRenderer() {
   const genotypeRenderer = {};
+  let genotypeImporter;
 
   // Variables for referring to the genotype canvas
   let genotypeCanvas;
@@ -263,7 +264,7 @@ export default function GenotypeRenderer() {
 
           processVariantSetCall(client, `/variantsets/${matrixId}/calls`)
             .then((variantSetCalls) => {
-              const genotypeImporter = new GenotypeImporter(genomeMap);
+              genotypeImporter = new GenotypeImporter(genomeMap);
 
               if (genomeMap === undefined) {
                 genomeMap = genotypeImporter.createFakeMapFromVariantSets(variantSetCalls);
@@ -298,7 +299,7 @@ export default function GenotypeRenderer() {
     } else {
       processVariantSetCall(client, `/variantsets/${matrixId}/calls`)
         .then((variantSetCalls) => {
-          const genotypeImporter = new GenotypeImporter(genomeMap);
+          genotypeImporter = new GenotypeImporter(genomeMap);
 
           if (genomeMap === undefined) {
             genomeMap = genotypeImporter.createFakeMapFromVariantSets(variantSetCalls);
@@ -354,7 +355,7 @@ export default function GenotypeRenderer() {
       axios.get(genotypeFileURL, {}, { headers: { 'Content-Type': 'text/plain' } }).then((response) => {
         genotypeFile = response.data;
       }).then(() => {
-        const genotypeImporter = new GenotypeImporter(genomeMap);
+        genotypeImporter = new GenotypeImporter(genomeMap);
 
         if (genomeMap === undefined) {
           genomeMap = genotypeImporter.createFakeMap(genotypeFile);
@@ -370,6 +371,14 @@ export default function GenotypeRenderer() {
 
         genotypeCanvas.init(dataSet, colorScheme);
         genotypeCanvas.prerender();
+
+        // Tells the dom parent that Flapjack has finished loading. Allows spinners
+        // or similar to be disabled
+        sendEvent('FlapjackFinished', domParent);
+      }).catch((error) => {
+        sendEvent('FlapjackError', domParent);
+        // eslint-disable-next-line no-console
+        console.log(error);
       });
     });
     return genotypeRenderer;
@@ -432,7 +441,7 @@ export default function GenotypeRenderer() {
 
     // Then genotype data
     genotypePromise.then((result) => {
-      const genotypeImporter = new GenotypeImporter(genomeMap);
+      genotypeImporter = new GenotypeImporter(genomeMap);
 
       if (genomeMap === undefined) {
         genomeMap = genotypeImporter.createFakeMap(result);
@@ -451,6 +460,10 @@ export default function GenotypeRenderer() {
     });
 
     return genotypeRenderer;
+  };
+
+  genotypeRenderer.getRenderingProgressPercentage = function getRenderingProgressPercentage() {
+	return genotypeImporter == null ? -1 : genotypeImporter.getImportProgressPercentage();
   };
 
   return genotypeRenderer;

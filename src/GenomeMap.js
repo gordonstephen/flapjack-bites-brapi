@@ -67,7 +67,7 @@ export default class GenomeMap {
     return { marker: chromosome.markers[markerIndex], markerIndex };
   }
 
-  markerByName(markerName) {
+  markerByName(markerName) {	/* this method could probably be optimized for faster loading (calling it again and again takes really long with numerous markers)*/
     let found = -1;
     this.chromosomes.forEach((chromosome, idx) => {
       const markerIndex = chromosome.markers.map(m => m.name).indexOf(markerName);

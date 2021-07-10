@@ -48,8 +48,13 @@ export default class NucleotideColorScheme {
     });
   }
 
+  getAlleleColor(allele) {
+	let color = this.colorMap.get(allele);
+	return color == null ? this.colorMap.get("-") : color;
+  }
+
   drawGradientSquare(size, genotype, font, fontSize) {
-    const color = this.colorMap.get(genotype.allele1);
+    const color = this.getAlleleColor(genotype.allele1);
     const gradCanvas = document.createElement('canvas');
     gradCanvas.width = size;
     gradCanvas.height = size;
@@ -72,8 +77,8 @@ export default class NucleotideColorScheme {
   }
 
   drawHetSquare(size, genotype, font, fontSize) {
-    const color1 = this.colorMap.get(genotype.allele1);
-    const color2 = this.colorMap.get(genotype.allele2);
+    const color1 = this.getAlleleColor(genotype.allele1);
+    const color2 = this.getAlleleColor(genotype.allele2);
     const gradCanvas = document.createElement('canvas');
     gradCanvas.width = size;
     gradCanvas.height = size;
